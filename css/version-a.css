@@ -1,0 +1,102 @@
+/* version-a.css -- Gamified Practice (Liquid Glass) */
+
+/* ===== CATEGORY CARDS ===== */
+.va-cat-card{text-align:left;position:relative;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .25s}
+.va-cat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.va-cat-card .icon{font-size:1.6rem;margin-bottom:4px}
+.va-cat-card .progress-bar{margin-top:8px;height:6px}
+
+/* ===== LESSON HEADER ===== */
+.va-lesson-header{display:flex;align-items:center;gap:12px;padding:8px 0 16px}
+.va-close-btn{width:44px;height:44px;border-radius:50%;border:none;
+  background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
+  font-size:1.3rem;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .2s;border:var(--glass-border)}
+.va-close-btn:hover{background:rgba(248,113,113,.12);color:var(--red)}
+.va-progress{flex:1;height:10px;border-radius:5px}
+.va-progress .progress-fill{transition:width .6s cubic-bezier(.4,0,.2,1)}
+.va-q-count{font-size:.8rem;font-weight:700;color:var(--text2);flex-shrink:0}
+
+/* ===== COMBO ===== */
+.va-combo{display:inline-flex;align-items:center;gap:6px;padding:7px 18px;
+  border-radius:var(--radius-pill);font-weight:800;font-size:.9rem;
+  background:linear-gradient(135deg,#FB923C,#FBBF24);color:#fff;
+  animation:vaComboIn .4s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 4px 16px rgba(251,146,60,.3)}
+.va-combo.va-combo-fire{background:linear-gradient(135deg,#F87171,#FB923C);
+  box-shadow:0 4px 20px rgba(248,113,113,.4);
+  animation:vaComboIn .4s cubic-bezier(.34,1.56,.64,1),vaComboPulse 1s ease infinite}
+@keyframes vaComboIn{0%{transform:scale(0) rotate(-10deg);opacity:0}60%{transform:scale(1.15) rotate(3deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes vaComboPulse{0%,100%{box-shadow:0 4px 20px rgba(248,113,113,.4)}50%{box-shadow:0 4px 28px rgba(248,113,113,.6)}}
+
+/* ===== EXERCISE CARD ===== */
+.va-exercise-card{text-align:center;padding:28px 20px;position:relative;overflow:hidden}
+.va-exercise-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--green),var(--blue),var(--purple));background-size:200% 100%;
+  animation:vaShimmerBar 3s linear infinite}
+@keyframes vaShimmerBar{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.va-question{font-size:.85rem;font-weight:600;color:var(--text3);margin-bottom:16px;
+  text-transform:uppercase;letter-spacing:.8px}
+.va-prompt{font-size:1.6rem;font-weight:700;color:var(--text);line-height:1.5}
+.va-prompt.serto{font-family:var(--font-serto);direction:rtl;unicode-bidi:isolate;font-size:2.4rem;line-height:1.8}
+
+/* ===== SCREEN FLASH ===== */
+.va-flash{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:9999;animation:vaFlash .5s ease-out forwards}
+.va-flash-green{background:radial-gradient(circle,rgba(52,211,153,.25),transparent 70%)}
+.va-flash-red{background:radial-gradient(circle,rgba(248,113,113,.2),transparent 70%)}
+@keyframes vaFlash{0%{opacity:1}100%{opacity:0}}
+
+/* ===== FLOATING XP ===== */
+.va-xp-float{position:fixed;left:50%;z-index:9998;font-size:1.4rem;font-weight:900;color:var(--green);
+  text-shadow:0 2px 12px rgba(52,211,153,.4);pointer-events:none;animation:vaXpFloat 1.2s cubic-bezier(.25,.46,.45,.94) forwards}
+@keyframes vaXpFloat{0%{transform:translate(-50%,0) scale(.5);opacity:0}20%{transform:translate(-50%,-10px) scale(1.3);opacity:1}100%{transform:translate(-50%,-80px) scale(.8);opacity:0}}
+
+/* ===== ANSWER FEEDBACK ===== */
+.va-fb-pop{animation:vaPop .35s cubic-bezier(.34,1.56,.64,1)}
+.va-fb-shake{animation:vaShake .4s ease}
+@keyframes vaPop{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+@keyframes vaShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+
+.option-btn.correct{box-shadow:0 0 0 3px rgba(52,211,153,.2);animation:vaGlow .6s ease,vaCorrectPulse .4s ease}
+.option-btn.wrong{box-shadow:0 0 0 3px rgba(248,113,113,.2);animation:vaShake .4s ease}
+@keyframes vaGlow{0%{box-shadow:0 0 0 0 rgba(52,211,153,.5)}50%{box-shadow:0 0 0 12px rgba(52,211,153,.1)}100%{box-shadow:0 0 0 3px rgba(52,211,153,.2)}}
+@keyframes vaCorrectPulse{0%{transform:scale(1)}40%{transform:scale(1.03)}100%{transform:scale(1)}}
+
+/* ===== CONFETTI ===== */
+.va-confetti{position:fixed;width:10px;height:10px;pointer-events:none;z-index:9997;border-radius:2px;
+  animation:vaConfettiFall var(--fall-dur,1.5s) cubic-bezier(.25,.46,.45,.94) forwards}
+@keyframes vaConfettiFall{0%{transform:translate(0,0) rotate(0deg) scale(1);opacity:1}50%{opacity:1}
+  100%{transform:translate(var(--drift,20px),var(--drop,400px)) rotate(var(--spin,720deg)) scale(.3);opacity:0}}
+
+/* ===== FINISH SCREEN ===== */
+.va-finish{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:70vh;text-align:center;animation:vaFadeUp .5s ease}
+.va-finish-card{width:100%;padding:32px 20px;position:relative;overflow:hidden}
+.va-finish-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--green),var(--gold),var(--orange));
+  animation:vaShimmerBar 2s linear infinite;background-size:200% 100%}
+.va-finish-icon{font-size:3.5rem;margin-bottom:8px;animation:vaBounce 1s ease infinite}
+.va-finish-stars{margin-bottom:12px}
+.va-star{font-size:2.2rem;letter-spacing:8px;display:inline-block}
+.va-star-item{display:inline-block;animation:vaStarPop .5s cubic-bezier(.34,1.56,.64,1) both}
+.va-star-item:nth-child(1){animation-delay:.2s}
+.va-star-item:nth-child(2){animation-delay:.45s}
+.va-star-item:nth-child(3){animation-delay:.7s}
+@keyframes vaStarPop{0%{transform:scale(0) rotate(-30deg);opacity:0}60%{transform:scale(1.4) rotate(10deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+.va-finish h1{color:var(--green);margin-bottom:4px;animation:vaFadeUp .6s .3s ease both}
+.va-finish-sub{color:var(--text2);font-size:.9rem;margin-bottom:16px;animation:vaFadeUp .6s .4s ease both}
+.va-finish .stat-row{width:100%;animation:vaFadeUp .6s .5s ease both}
+.va-continue-btn{margin-top:20px;font-size:1.1rem;padding:16px 32px;animation:vaFadeUp .6s .7s ease both}
+
+@keyframes vaFadeUp{0%{opacity:0;transform:translateY(24px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes vaBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+/* ===== DARK MODE ===== */
+@media(prefers-color-scheme:dark){
+  .va-exercise-card::before{opacity:.8}
+  .va-finish-card::before{opacity:.7}
+  .option-btn.correct{background:rgba(52,211,153,.1);box-shadow:0 0 0 3px rgba(52,211,153,.12)}
+  .option-btn.wrong{background:rgba(248,113,113,.1);box-shadow:0 0 0 3px rgba(248,113,113,.1)}
+  .va-flash-green{background:radial-gradient(circle,rgba(52,211,153,.15),transparent 70%)}
+  .va-flash-red{background:radial-gradient(circle,rgba(248,113,113,.12),transparent 70%)}
+}

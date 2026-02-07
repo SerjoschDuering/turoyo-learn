@@ -1,0 +1,92 @@
+/* Version B - Calm Study (Liquid Glass) */
+
+/* ===== Dashboard ===== */
+.b-dashboard{padding-bottom:24px}
+.b-dashboard h3{margin-top:24px;margin-bottom:10px;color:var(--text2);font-size:.9rem;letter-spacing:.02em}
+.b-empty{font-size:.85rem;color:var(--text3);padding:8px 0}
+
+/* ===== Proverb ===== */
+.b-proverb{
+  border-left:3px solid var(--b-warm);
+  background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
+  border:var(--glass-border);border-left:3px solid var(--b-warm);
+  padding:18px 20px;margin-bottom:16px;border-radius:var(--radius-lg);
+}
+.b-proverb-latin{font-style:italic;font-size:1rem;line-height:1.5;color:var(--text);margin-bottom:6px}
+.b-proverb-en{font-size:.8rem;color:var(--b-warm);line-height:1.4}
+
+/* ===== Review Card ===== */
+.b-review-card{text-align:center;
+  background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  border:1px solid rgba(99,102,241,.15);padding:28px 20px;border-radius:var(--radius-lg)}
+.b-due-count{font-size:2.8rem;font-weight:800;color:var(--b-primary);line-height:1}
+.b-due-label{font-size:.9rem;color:var(--text2);margin:6px 0 18px}
+
+/* ===== Review Mode ===== */
+.b-review{position:relative}
+.b-review-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.b-close-btn,.b-back-btn{background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
+  border:var(--glass-border);font-size:1.3rem;color:var(--text2);cursor:pointer;
+  padding:10px 14px;min-width:44px;min-height:44px;border-radius:50%;
+  transition:all .2s;display:inline-flex;align-items:center;justify-content:center}
+.b-close-btn:hover,.b-back-btn:hover{background:rgba(99,102,241,.1)}
+.b-review-count{font-size:.85rem;color:var(--text3);font-weight:600}
+
+/* ===== Flashcard Override ===== */
+.b-flashcard{min-height:300px;border:var(--glass-border);
+  box-shadow:0 8px 40px rgba(99,102,241,.08),var(--glass-inset);
+  transition:transform .4s cubic-bezier(.25,.46,.45,.94);position:relative;overflow:hidden}
+.b-flashcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--b-primary),var(--b-warm));opacity:0;transition:opacity .3s}
+.b-flashcard.revealed::before{opacity:1}
+.b-flashcard .serto{font-size:2.8rem}
+.b-flashcard .latin{font-size:1.3rem;color:var(--text2);margin-top:8px}
+.b-flashcard .meaning{font-size:1.05rem;color:var(--b-warm);margin-top:14px;
+  transform:translateY(6px);transition:opacity .35s ease,transform .35s ease}
+.b-flashcard.revealed .meaning{opacity:1;transform:translateY(0)}
+.b-flashcard .tap-hint{color:var(--text3);font-size:.78rem;margin-top:20px}
+
+/* ===== Note Area ===== */
+.b-note-area{min-height:40px}
+.b-note-area .note-box{opacity:0;animation:b-fadeUp .3s .15s forwards}
+.b-flashcard.revealed~.b-note-area .note-box{opacity:1}
+@keyframes b-fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== Rating Bar ===== */
+.b-rating-bar{margin-top:12px;animation:b-fadeUp .25s ease forwards}
+.b-rating-bar .rating-btn{font-size:.82rem;border-width:1.5px}
+
+/* ===== Summary ===== */
+.b-summary{padding-top:40px;text-align:center}
+.b-summary h2{color:var(--b-primary);margin-bottom:20px}
+.b-summary .card{margin-bottom:24px}
+.b-breakdown{display:flex;justify-content:center;align-items:flex-end;gap:16px;padding:20px 0 8px}
+.b-break-item{display:flex;flex-direction:column;align-items:center;gap:4px}
+.b-break-bar{width:28px;border-radius:8px 8px 0 0;transition:height .4s ease}
+.b-break-count{font-size:.85rem;font-weight:700;color:var(--text)}
+.b-break-label{font-size:.7rem;color:var(--text3)}
+
+/* ===== Collection Browse ===== */
+.b-collection-header{margin-bottom:16px}
+.b-collection-header h2{margin-top:8px}
+.b-collection-sub{font-size:.82rem;color:var(--text3);margin-top:2px}
+.b-back-btn{margin-left:-10px;font-size:.95rem}
+.b-word-list{display:flex;flex-direction:column;gap:1px}
+.b-word-row{display:flex;align-items:center;gap:14px;padding:14px 16px;
+  background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
+  border-radius:var(--radius-md);border:var(--glass-border);transition:background .15s;margin-bottom:4px}
+.b-word-row.b-word-known{border-left:3px solid var(--b-primary)}
+.b-word-serto{font-size:1.5rem;min-width:60px;text-align:center}
+.b-word-info{flex:1;min-width:0}
+.b-word-latin{font-size:.95rem;font-weight:600;color:var(--text)}
+.b-word-meaning{font-size:.8rem;color:var(--text2);margin-top:2px}
+.b-gender-tag{font-size:.7rem;padding:3px 10px;border-radius:var(--radius-pill);
+  background:rgba(99,102,241,.1);color:var(--b-primary);font-weight:600;flex-shrink:0}
+
+/* ===== Dark Mode ===== */
+@media(prefers-color-scheme:dark){
+  .b-proverb{background:var(--glass-bg)}
+  .b-review-card{background:var(--glass-bg);border-color:rgba(99,102,241,.2)}
+  .b-flashcard{box-shadow:0 8px 40px rgba(0,0,0,.2),var(--glass-inset)}
+  .b-gender-tag{background:rgba(99,102,241,.15)}
+}

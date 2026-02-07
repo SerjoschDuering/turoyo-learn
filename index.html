@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#F0EDFF">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Surayt Learn — Turoyo Language App</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Syriac:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/version-a.css">
+  <link rel="stylesheet" href="css/exercises.css">
+  <link rel="stylesheet" href="css/version-b.css">
+  <link rel="stylesheet" href="css/recorder.css">
+  <link rel="stylesheet" href="css/grammar-chat.css">
+  <link rel="stylesheet" href="css/script-tab.css">
+  <style>
+    .hero{text-align:center;padding:40px 16px 28px}
+    .hero-logo{font-size:4rem;margin-bottom:12px;filter:drop-shadow(0 4px 16px rgba(167,139,250,.25))}
+    .hero h1{font-size:2rem;
+      background:linear-gradient(135deg,#34D399,#60A5FA,#A78BFA);background-size:200% auto;
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px;
+      animation:heroGradient 4s ease infinite}
+    @keyframes heroGradient{0%,100%{background-position:0% center}50%{background-position:200% center}}
+    .hero .sub{color:var(--text2);font-size:1rem;margin-bottom:16px;letter-spacing:.01em}
+    .version-label{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+    .version-label .dot{width:10px;height:10px;border-radius:50%;box-shadow:0 0 8px currentColor}
+    .version-label h2{margin-bottom:0;font-size:1.15rem}
+    .version-desc{color:var(--text2);font-size:.9rem;line-height:1.6;margin-bottom:20px}
+    .feature-list{list-style:none;padding:0}
+    .feature-list li{padding:10px 0;padding-left:32px;position:relative;font-size:.9rem;color:var(--text2);line-height:1.4}
+    .feature-list li::before{content:"\2713";position:absolute;left:0;color:var(--green);font-weight:800;font-size:1.1rem}
+    .about-section{margin-top:20px;padding:20px;
+      background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+      border:var(--glass-border);border-radius:var(--radius-lg);box-shadow:var(--glass-shadow)}
+    .about-section h3{color:var(--text);margin-bottom:8px}
+    .about-section p{font-size:.85rem;color:var(--text2);line-height:1.7}
+    .lang-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 18px;
+      background:var(--glass-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+      border:var(--glass-border);color:var(--text);border-radius:var(--radius-pill);
+      font-weight:700;font-size:.8rem;margin-bottom:16px}
+    .lang-toggle{display:inline-flex;border-radius:var(--radius-pill);overflow:hidden;
+      background:var(--glass-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+      border:var(--glass-border);margin-bottom:16px;padding:3px}
+    .lang-opt{padding:8px 20px;font-size:.8rem;font-weight:700;border:none;cursor:pointer;
+      background:transparent;color:var(--text2);font-family:var(--font-ui);transition:all .2s;
+      border-radius:var(--radius-pill);min-height:36px}
+    .lang-opt.active{background:linear-gradient(135deg,#6366F1,#4F46E5);color:#fff;
+      box-shadow:0 2px 8px rgba(99,102,241,.3)}
+    .welcome-card{text-align:center;padding:28px 20px;
+      background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+      border:1px solid rgba(52,211,153,.25);margin-bottom:20px;border-radius:var(--radius-lg)}
+    .welcome-card h2{color:var(--green);margin-bottom:8px}
+    .welcome-card p{color:var(--text2);font-size:.9rem;margin-bottom:16px}
+    .welcome-actions{display:flex;gap:10px}
+    .welcome-actions .btn{flex:1;font-size:.85rem;padding:14px}
+  </style>
+</head>
+<body>
+<!-- EN/DE Translation Helper -->
+<script>
+window.T = function(obj) {
+  var lang = localStorage.getItem('turoyo_lang') || 'en';
+  return obj[lang] || obj.en || '';
+};
+T.key = function() { return localStorage.getItem('turoyo_lang') || 'en'; };
+</script>
+
+<div class="app">
+  <!-- ===== OVERVIEW TAB ===== -->
+  <div class="page active" id="page-overview">
+    <!-- Onboarding for first-time users -->
+    <div class="card welcome-card" id="welcome-card" style="display:none">
+      <div style="font-size:2.5rem;margin-bottom:8px">&#x072B;</div>
+      <h2>Welcome to Surayt Learn!</h2>
+      <p>Learn Turoyo, the living Aramean language. Pick how you want to start:</p>
+      <div class="welcome-actions">
+        <button class="btn btn-primary" onclick="switchTab('version-a');localStorage.setItem('turoyo_welcomed','1');document.getElementById('welcome-card').style.display='none'">
+          Practice
+        </button>
+        <button class="btn btn-b" onclick="switchTab('version-b');localStorage.setItem('turoyo_welcomed','1');document.getElementById('welcome-card').style.display='none'">
+          Study
+        </button>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-logo">&#x072B;</div>
+      <h1>Surayt Learn</h1>
+      <p class="sub">Learn Turoyo &#x2014; the living Aramean language</p>
+      <span class="lang-badge">&#x0723;&#x0718;&#x072A;&#x0730;&#x071D;&#x072C; Surayt / Turoyo</span>
+      <br>
+      <div class="lang-toggle" id="lang-toggle">
+        <button class="lang-opt active" data-lang="en">EN</button>
+        <button class="lang-opt" data-lang="de">DE</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="version-label">
+        <div class="dot" style="background:var(--green)"></div>
+        <h2>Practice &#x2014; Gamified</h2>
+      </div>
+      <p class="version-desc">
+        Duolingo-style learning with XP, streaks, and bite-sized lessons.
+        Fun and motivating &#x2014; perfect for daily habit building.
+      </p>
+      <ul class="feature-list">
+        <li>Typing, matching, and sentence building exercises</li>
+        <li>XP points, combo streaks, and daily challenges</li>
+        <li>Category-based lessons (family, food, greetings...)</li>
+        <li>Confetti celebrations and progress tracking</li>
+      </ul>
+      <button class="btn btn-primary" style="margin-top:16px" onclick="switchTab('version-a')">
+        Start Practicing
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="version-label">
+        <div class="dot" style="background:var(--b-primary)"></div>
+        <h2>Study &#x2014; Flashcards</h2>
+      </div>
+      <p class="version-desc">
+        Minimalist flashcard tool with spaced repetition. Focused and
+        self-paced &#x2014; ideal for serious vocabulary building.
+      </p>
+      <ul class="feature-list">
+        <li>SRS flashcards with smart review scheduling</li>
+        <li>Serto script alongside Latin transliteration</li>
+        <li>Tap any word for grammar X-ray</li>
+        <li>Browse word collections by topic</li>
+      </ul>
+      <button class="btn btn-b" style="margin-top:16px" onclick="switchTab('version-b')">
+        Start Studying
+      </button>
+    </div>
+
+    <!-- Enhanced Proverb of the Day -->
+    <div id="overview-proverb" style="margin-top:24px"></div>
+
+    <!-- Conversation Practice -->
+    <div class="about-section" style="margin-top:24px">
+      <h3>Practice Conversations</h3>
+      <p style="font-size:.85rem;color:var(--text2);margin-bottom:12px">Interactive dialogues &#x2014; fill in the blanks and learn real Turoyo conversations.</p>
+      <div id="overview-conversations"></div>
+    </div>
+
+    <div class="about-section">
+      <h3>Vocabulary in this app</h3>
+      <p id="word-count-info"></p>
+      <div class="cat-grid" style="margin-top:12px" id="overview-cats"></div>
+    </div>
+
+    <div class="about-section">
+      <h3>About Turoyo / Surayt</h3>
+      <p>
+        Turoyo (&#x0718;&#x072A;&#x0733;&#x071D;&#x0710;) is a living Neo-Aramaic language spoken by approximately
+        50,000&#x2013;250,000 people worldwide. Originally from Tur Abdin in southeastern Turkey,
+        most speakers today live in diaspora communities across Germany, Sweden, and the Netherlands.
+        UNESCO classifies Turoyo as &#x201C;severely endangered.&#x201D;
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== VERSION A TAB ===== -->
+  <div class="page" id="page-a"></div>
+
+  <!-- ===== VERSION B TAB ===== -->
+  <div class="page" id="page-b"></div>
+
+  <!-- ===== SCRIPT TAB ===== -->
+  <div class="page" id="page-script"></div>
+
+  <!-- ===== RECORDER TAB ===== -->
+  <div class="page" id="page-rec"></div>
+
+  <!-- ===== BOTTOM NAVIGATION ===== -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" data-tab="overview" onclick="switchTab('overview')">
+      <span class="icon">&#x1F3E0;</span><span class="label">Home</span>
+    </div>
+    <div class="nav-item" data-tab="version-a" onclick="switchTab('version-a')">
+      <span class="icon">&#x1F3AE;</span><span class="label">Practice</span>
+    </div>
+    <div class="nav-item" data-tab="version-b" onclick="switchTab('version-b')">
+      <span class="icon">&#x1F4DA;</span><span class="label">Study</span>
+    </div>
+    <div class="nav-item" data-tab="script" onclick="switchTab('script')">
+      <span class="icon">&#x072B;</span><span class="label">Script</span>
+    </div>
+    <div class="nav-item" data-tab="recorder" onclick="switchTab('recorder')">
+      <span class="icon">&#x1F3A4;</span><span class="label">Record</span>
+    </div>
+  </nav>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/data-alphabet.js"></script>
+<script src="js/data-phrases.js"></script>
+<script src="js/vfx.js"></script>
+<script src="js/exercise-types.js"></script>
+<script src="js/version-a.js"></script>
+<script src="js/version-b.js"></script>
+<script src="js/grammar.js"></script>
+<script src="js/conv-data.js"></script>
+<script src="js/conversations.js"></script>
+<script src="js/recorder-ui.js"></script>
+<script src="js/recorder.js"></script>
+<script src="js/script-tab.js"></script>
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.nav-item').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pageMap = {'overview':'page-overview','version-a':'page-a','version-b':'page-b','script':'page-script','recorder':'page-rec'};
+  document.getElementById(pageMap[tab]).classList.add('active');
+  if (tab === 'version-a' && typeof VersionA !== 'undefined') VersionA.init();
+  if (tab === 'version-b' && typeof VersionB !== 'undefined') VersionB.init();
+  if (tab === 'script' && typeof ScriptTab !== 'undefined') ScriptTab.init();
+  if (tab === 'recorder' && typeof Recorder !== 'undefined') Recorder.init(document.getElementById('page-rec'));
+}
+
+// Grammar X-ray global handler
+if (typeof GrammarXray !== 'undefined') GrammarXray.init();
+
+// Onboarding
+if (!localStorage.getItem('turoyo_welcomed')) {
+  document.getElementById('welcome-card').style.display = 'block';
+}
+
+// EN/DE toggle
+(function() {
+  var toggle = document.getElementById('lang-toggle');
+  var current = localStorage.getItem('turoyo_lang') || 'en';
+  toggle.querySelectorAll('.lang-opt').forEach(function(btn) {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === current);
+    btn.addEventListener('click', function() {
+      var lang = btn.getAttribute('data-lang');
+      localStorage.setItem('turoyo_lang', lang);
+      toggle.querySelectorAll('.lang-opt').forEach(function(b) {
+        b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+      });
+      // Re-render overview stats
+      renderOverview();
+    });
+  });
+})();
+
+function renderOverview() {
+  var lang = T.key();
+  document.getElementById('word-count-info').textContent =
+    WORDS.length + ' words across ' + Object.keys(CATEGORIES).length + ' categories, with Serto script and Latin transliteration.';
+  var overviewCats = document.getElementById('overview-cats');
+  overviewCats.innerHTML = '';
+  Object.entries(CATEGORIES).forEach(function([key, cat]) {
+    var count = WORDS.filter(function(w) { return w.cat === key; }).length;
+    var name = lang === 'de' && cat.de ? cat.de : cat.name;
+    overviewCats.innerHTML += '<div class="cat-card">' +
+      '<div class="icon">' + cat.icon + '</div>' +
+      '<div class="name">' + name + '</div>' +
+      '<div class="count">' + count + ' words</div>' +
+    '</div>';
+  });
+}
+renderOverview();
+
+// Enhanced proverb + conversations
+if (typeof ConversationMode !== 'undefined') {
+  ConversationMode.enhancedProverb(document.getElementById('overview-proverb'));
+  ConversationMode.init(document.getElementById('overview-conversations'));
+}
+</script>
+</body>
+</html>

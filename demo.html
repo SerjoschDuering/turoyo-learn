@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#F0EDFF">
+  <title>Surayt Learn — Micro-Lessons Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Syriac:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/demo.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== TOP BAR ===== -->
+  <header class="demo-header">
+    <div class="demo-xp" id="xp-display">0 XP</div>
+    <div class="demo-title">Surayt Learn</div>
+    <div class="demo-streak" id="streak-display">0</div>
+  </header>
+
+  <!-- ===== SCREENS ===== -->
+  <div id="screen-home" class="screen active">
+    <div class="hero-mini">
+      <div class="serto" style="font-size:2.8rem;margin-bottom:4px">&#x072B;&#x0720;&#x0733;&#x0721;&#x0710;</div>
+      <h1>Micro-Lessons</h1>
+      <p class="sub">Gamified learning from Slomo Surayt</p>
+    </div>
+
+    <div class="session-cards" id="session-cards"></div>
+
+    <button class="btn btn-primary pulse-btn" onclick="startSmartSession()" style="margin-top:20px">
+      Start Smart Session
+    </button>
+    <p style="text-align:center;font-size:.8rem;color:var(--text3);margin-top:8px">
+      Adapts to your level &mdash; 3-5 min
+    </p>
+  </div>
+
+  <!-- ===== ALPHABET EXPLORER ===== -->
+  <div id="screen-alphabet" class="screen">
+    <div class="screen-top">
+      <button class="back-btn" onclick="goHome()">&larr;</button>
+      <h2>Script Explorer</h2>
+      <div></div>
+    </div>
+    <div class="alpha-tabs">
+      <button class="alpha-tab active" onclick="showAlphaGroup('all',this)">All</button>
+      <button class="alpha-tab" onclick="showAlphaGroup('connect-both',this)">Both-connect</button>
+      <button class="alpha-tab" onclick="showAlphaGroup('connect-right',this)">Right-only</button>
+    </div>
+    <div class="alpha-grid" id="alpha-grid"></div>
+    <div class="char-detail" id="char-detail"></div>
+  </div>
+
+  <!-- ===== EXERCISE SESSION ===== -->
+  <div id="screen-session" class="screen">
+    <div class="session-header">
+      <button class="back-btn" onclick="endSession()">&times;</button>
+      <div class="session-progress">
+        <div class="session-progress-fill" id="session-progress"></div>
+      </div>
+      <div class="session-hearts" id="session-hearts"></div>
+    </div>
+    <div id="exercise-area"></div>
+  </div>
+
+  <!-- ===== SESSION COMPLETE ===== -->
+  <div id="screen-complete" class="screen">
+    <div class="complete-content">
+      <div class="complete-icon">&#127942;</div>
+      <h1>Session Complete!</h1>
+      <div class="complete-stats" id="complete-stats"></div>
+      <button class="btn btn-primary" onclick="goHome()" style="margin-top:24px">Continue</button>
+    </div>
+  </div>
+
+</div>
+<script src="js/demo-data.js"></script>
+<script src="js/demo-engine.js"></script>
+</body>
+</html>
