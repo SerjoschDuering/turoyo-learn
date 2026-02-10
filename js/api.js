@@ -14,10 +14,21 @@ const API = (() => {
   let progressTimer = null;
   let pendingProgress = null;
   const DEBOUNCE_MS = 5000;
+  const FETCH_TIMEOUT_MS = 8000;
 
   /* ---- Helpers ---- */
+  function fetchWithTimeout(url, opts) {
+    if (typeof AbortController !== 'undefined') {
+      var ctrl = new AbortController();
+      var timer = setTimeout(function () { ctrl.abort(); }, FETCH_TIMEOUT_MS);
+      opts = Object.assign({}, opts, { signal: ctrl.signal });
+      return fetch(url, opts).finally(function () { clearTimeout(timer); });
+    }
+    return fetch(url, opts);
+  }
+
   function post(url, body) {
-    return fetch(url, {
+    return fetchWithTimeout(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-App-Key': APP_KEY },
       body: JSON.stringify(body)
@@ -30,8 +41,11 @@ const API = (() => {
   /* ---- Content API ---- */
   function fetchContent(forceRefresh) {
     if (contentCache && !forceRefresh) return Promise.resolve(contentCache);
-    return fetch(CONTENT_URL)
-      .then(r => r.json())
+    return fetchWithTimeout(CONTENT_URL, {})
+      .then(r => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
       .then(d => {
         const data = Array.isArray(d) ? d[0] : d;
         contentCache = data;
@@ -69,7 +83,12 @@ const API = (() => {
   function updateProgress(progress) {
     const token = getToken();
     if (!token) return;
-    pendingProgress = { action: 'update_progress', token: token, progress: progress };
+    // Merge with any pending progress (don't overwrite cross-module data)
+    if (pendingProgress) {
+      pendingProgress.progress = Object.assign(pendingProgress.progress, progress);
+    } else {
+      pendingProgress = { action: 'update_progress', token: token, progress: progress };
+    }
     if (!progressTimer) {
       progressTimer = setTimeout(flushProgress, DEBOUNCE_MS);
     }
@@ -81,6 +100,14 @@ const API = (() => {
     if (!pendingProgress) return;
     const payload = pendingProgress;
     pendingProgress = null;
+    // Use sendBeacon for reliability during page unload
+    if (document.visibilityState === 'hidden' && navigator.sendBeacon) {
+      navigator.sendBeacon(USER_URL, new Blob(
+        [JSON.stringify(payload)],
+        { type: 'application/json' }
+      ));
+      return;
+    }
     post(USER_URL, payload).catch(() => {});
   }
 

@@ -33,19 +33,21 @@ Everything is in `index.html`. Five tabs controlled by `switchTab()`:
 | Script | `page-script` | `script-tab.js` (ScriptTab) | Serto alphabet explorer |
 | Record | `page-rec` | `recorder.js` (Recorder) | Audio pronunciation recorder |
 
-### Data layer (dual: local JS + NocoDB)
+### Data layer (dual: local JS + NocoDB via DataLoader)
 
-Content currently loads from local JS files. The API layer exists but frontend modules haven't been wired to use it yet.
+On boot, `DataLoader.init()` tries the API first, then falls back to built-in JS data. The overview renders immediately with built-in data; if the API responds, it re-renders with fresh content.
 
-**Local JS data files** (loaded via script tags, expose global constants):
+**Built-in JS data files** (loaded via script tags, expose global arrays/objects):
 - `data.js` → `WORDS` (90 items), `CATEGORIES` (9), `PROVERBS` (3)
 - `data-alphabet.js` → `ALPHABET` (22 letters, uses `var`)
 - `data-phrases.js` → `PHRASES` (14 items, uses `var`)
 - `conv-data.js` → `CONV_SCRIPTS` (6 conversations), `PROVERB_DETAILS` (3, uses `var`)
 
+**DataLoader** (`js/data-loader.js`): Calls `API.fetchContent()`, maps API fields to the global shapes above, splices data in-place using `.length = 0; forEach push`. All consumer modules continue reading the same globals.
+
 **NocoDB** (same data, synced): 7 tables at `nocodb.run8n.xyz`, accessed through n8n webhooks.
 
-**Important**: `data.js` uses `const`, the other data files use `var`. This matters if loading them in Node.js with `vm.runInContext` (only `var` creates context properties).
+**Important**: `data.js` uses `const`, the other data files use `var`. Both support in-place mutation (`.length=0`, `.push()`).
 
 ### Backend proxy (n8n → NocoDB)
 
@@ -63,14 +65,14 @@ The NocoDB API token lives in n8n's credential vault (ID `RwsNAtv3iBCVs2i1`), ne
 
 ### JS module pattern
 
-All modules use either IIFE (`const X = (() => { ... })()`) or object literal (`var X = { ... }`) patterns. They expose a single global: `VersionA`, `VersionB`, `ConversationMode`, `Recorder`, `ScriptTab`, `GrammarXray`, `ExerciseTypes`, `VFX`, `API`.
+All modules use either IIFE (`const X = (() => { ... })()`) or object literal (`var X = { ... }`) patterns. They expose a single global: `VersionA`, `VersionB`, `ConversationMode`, `Recorder`, `ScriptTab`, `GrammarXray`, `ExerciseTypes`, `VFX`, `API`, `DataLoader`.
 
 Dependencies are declared in file headers as comments. Load order in `index.html` matters:
-`api.js` → `data.js` → `data-alphabet.js` → `data-phrases.js` → `vfx.js` → `exercise-types.js` → `version-a.js` → `version-b.js` → `grammar.js` → `conv-data.js` → `conversations.js` → `recorder-ui.js` → `recorder.js` → `script-tab.js`
+`api.js` → `data.js` → `data-alphabet.js` → `data-phrases.js` → `data-loader.js` → `vfx.js` → `exercise-types.js` → `version-a.js` → `version-b.js` → `grammar.js` → `conv-data.js` → `conversations.js` → `recorder-ui.js` → `recorder.js` → `script-tab.js`
 
 ### localStorage keys
 
-All user state is in localStorage (not yet migrated to API):
+User state is in localStorage as primary store, synced to API when a user token exists:
 
 | Key | Module | Content |
 |-----|--------|---------|
@@ -80,6 +82,7 @@ All user state is in localStorage (not yet migrated to API):
 | `turoyo_rec_speaker`, `_stories` | Recorder | Speaker name, story recordings |
 | `turoyo_lang` | index.html | UI language (en/de) |
 | `turoyo_welcomed` | index.html | Onboarding shown flag |
+| `turoyo_user_name` | index.html | User display name |
 | `surayt_user_token` | API | User auth token |
 | `surayt_api_content` | API | Cached content from n8n |
 
@@ -107,7 +110,8 @@ All user state is in localStorage (not yet migrated to API):
 
 ## Migration status
 
-Backend is live (n8n + NocoDB). Frontend still reads from local JS files. Remaining work:
-- Wire `version-a.js`, `version-b.js`, `conversations.js`, `recorder.js` to use `API.fetchContent()` instead of global JS constants
-- Add user creation/login flow in the UI
-- Implement offline fallback (API → localStorage cache → retry on reconnect)
+Backend is wired. `DataLoader` bridges API → global JS vars. Service Worker enables offline PWA. User auth creates accounts via n8n. Progress syncs (debounced) to server. Remaining work:
+- Build n8n workflow for PDF → AI → vocabulary extraction *(requires n8n admin)*
+- Expand grammar root analysis beyond 30 words *(content task)*
+- Add more conversation scripts *(content task)*
+- n8n audio workflow needs fixing to actually store audio binary (currently metadata-only)

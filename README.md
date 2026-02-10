@@ -349,13 +349,19 @@ Claude Code will:
 3. Push to GitHub
 4. GitHub Pages will automatically update the live site (takes about 1 minute)
 
-### First-time deploy setup
+### First-time setup (enable GitHub Pages)
 
-If GitHub Pages is not yet enabled, tell Claude Code:
+1. Go to your repository on GitHub
+2. Click **Settings** → **Pages** (in the left sidebar)
+3. Under **Source**, select **Deploy from a branch**
+4. Under **Branch**, select **main** and folder **/ (root)**
+5. Click **Save**
+6. Wait ~1 minute, then refresh -- you'll see your live URL:
+   `https://{your-username}.github.io/turoyo-learn/`
 
-```
-Set up GitHub Pages for this repository so it deploys from the main branch
-```
+That's it. From now on, every push to `main` automatically rebuilds and
+updates the live site. No extra commands or CI setup needed -- GitHub Pages
+handles it.
 
 ---
 

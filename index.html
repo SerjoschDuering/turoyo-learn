@@ -73,16 +73,25 @@ T.key = function() { return localStorage.getItem('turoyo_lang') || 'en'; };
 <div class="app">
   <!-- ===== OVERVIEW TAB ===== -->
   <div class="page active" id="page-overview">
+    <!-- User badge (shown when logged in) -->
+    <div id="user-badge-area" style="text-align:right;margin-bottom:4px;display:none">
+      <span class="user-badge" onclick="showSettings()">
+        <span class="user-avatar" id="user-avatar-letter">?</span>
+        <span id="user-badge-name">Learner</span>
+      </span>
+    </div>
+
     <!-- Onboarding for first-time users -->
     <div class="card welcome-card" id="welcome-card" style="display:none">
       <div style="font-size:2.5rem;margin-bottom:8px">&#x072B;</div>
       <h2>Welcome to Surayt Learn!</h2>
-      <p>Learn Turoyo, the living Aramean language. Pick how you want to start:</p>
+      <p>Learn Turoyo, the living Aramean language. Enter your name to get started:</p>
+      <input type="text" class="welcome-name-input" id="welcome-name" placeholder="Your name..." maxlength="30">
       <div class="welcome-actions">
-        <button class="btn btn-primary" onclick="switchTab('version-a');localStorage.setItem('turoyo_welcomed','1');document.getElementById('welcome-card').style.display='none'">
+        <button class="btn btn-primary" onclick="completeWelcome('version-a')">
           Practice
         </button>
-        <button class="btn btn-b" onclick="switchTab('version-b');localStorage.setItem('turoyo_welcomed','1');document.getElementById('welcome-card').style.display='none'">
+        <button class="btn btn-b" onclick="completeWelcome('version-b')">
           Study
         </button>
       </div>
@@ -165,6 +174,19 @@ T.key = function() { return localStorage.getItem('turoyo_lang') || 'en'; };
         UNESCO classifies Turoyo as &#x201C;severely endangered.&#x201D;
       </p>
     </div>
+
+    <div style="text-align:center;padding:8px 0">
+      <button class="settings-link" onclick="showSettings()">&#x2699;&#xFE0F; Settings</button>
+    </div>
+
+    <!-- Settings panel (hidden by default) -->
+    <div class="card settings-panel" id="settings-panel" style="display:none">
+      <h3>Settings</h3>
+      <label for="settings-name">Display Name</label>
+      <input type="text" id="settings-name" placeholder="Your name..." maxlength="30">
+      <button class="btn btn-secondary" onclick="saveSettings()">Save</button>
+      <button class="btn btn-secondary" style="margin-top:8px" onclick="document.getElementById('settings-panel').style.display='none'">Cancel</button>
+    </div>
   </div>
 
   <!-- ===== VERSION A TAB ===== -->
@@ -203,6 +225,7 @@ T.key = function() { return localStorage.getItem('turoyo_lang') || 'en'; };
 <script src="js/data.js"></script>
 <script src="js/data-alphabet.js"></script>
 <script src="js/data-phrases.js"></script>
+<script src="js/data-loader.js"></script>
 <script src="js/vfx.js"></script>
 <script src="js/exercise-types.js"></script>
 <script src="js/version-a.js"></script>
@@ -214,6 +237,12 @@ T.key = function() { return localStorage.getItem('turoyo_lang') || 'en'; };
 <script src="js/recorder.js"></script>
 <script src="js/script-tab.js"></script>
 <script>
+/* ---- Service Worker ---- */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(function () {});
+}
+
+/* ---- Tab navigation ---- */
 function switchTab(tab) {
   document.querySelectorAll('.nav-item').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -225,15 +254,55 @@ function switchTab(tab) {
   if (tab === 'recorder' && typeof Recorder !== 'undefined') Recorder.init(document.getElementById('page-rec'));
 }
 
-// Grammar X-ray global handler
-if (typeof GrammarXray !== 'undefined') GrammarXray.init();
+/* ---- User welcome & auth ---- */
+function completeWelcome(tab) {
+  var name = (document.getElementById('welcome-name').value || '').trim() || 'Learner';
+  localStorage.setItem('turoyo_welcomed', '1');
+  localStorage.setItem('turoyo_user_name', name);
+  document.getElementById('welcome-card').style.display = 'none';
 
-// Onboarding
-if (!localStorage.getItem('turoyo_welcomed')) {
-  document.getElementById('welcome-card').style.display = 'block';
+  // Create user on server (non-blocking)
+  if (typeof API !== 'undefined') {
+    API.createUser(name, T.key()).then(function () {
+      updateUserBadge();
+    }).catch(function () {});
+  }
+  updateUserBadge();
+  switchTab(tab);
 }
 
-// EN/DE toggle
+function updateUserBadge() {
+  var name = localStorage.getItem('turoyo_user_name');
+  var area = document.getElementById('user-badge-area');
+  if (name) {
+    area.style.display = 'block';
+    document.getElementById('user-badge-name').textContent = name;
+    document.getElementById('user-avatar-letter').textContent = name.charAt(0).toUpperCase();
+  } else {
+    area.style.display = 'none';
+  }
+}
+
+function showSettings() {
+  var panel = document.getElementById('settings-panel');
+  var nameInput = document.getElementById('settings-name');
+  nameInput.value = localStorage.getItem('turoyo_user_name') || '';
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function saveSettings() {
+  var name = (document.getElementById('settings-name').value || '').trim();
+  if (name) {
+    localStorage.setItem('turoyo_user_name', name);
+    updateUserBadge();
+  }
+  document.getElementById('settings-panel').style.display = 'none';
+}
+
+/* ---- Grammar X-ray ---- */
+if (typeof GrammarXray !== 'undefined') GrammarXray.init();
+
+/* ---- EN/DE toggle ---- */
 (function() {
   var toggle = document.getElementById('lang-toggle');
   var current = localStorage.getItem('turoyo_lang') || 'en';
@@ -245,12 +314,12 @@ if (!localStorage.getItem('turoyo_welcomed')) {
       toggle.querySelectorAll('.lang-opt').forEach(function(b) {
         b.classList.toggle('active', b.getAttribute('data-lang') === lang);
       });
-      // Re-render overview stats
       renderOverview();
     });
   });
 })();
 
+/* ---- Overview rendering ---- */
 function renderOverview() {
   var lang = T.key();
   document.getElementById('word-count-info').textContent =
@@ -267,13 +336,23 @@ function renderOverview() {
     '</div>';
   });
 }
-renderOverview();
 
-// Enhanced proverb + conversations
+/* ---- Boot sequence ---- */
+// Render immediately with built-in data (no blank screen)
+renderOverview();
+if (!localStorage.getItem('turoyo_welcomed')) {
+  document.getElementById('welcome-card').style.display = 'block';
+}
+updateUserBadge();
 if (typeof ConversationMode !== 'undefined') {
   ConversationMode.enhancedProverb(document.getElementById('overview-proverb'));
   ConversationMode.init(document.getElementById('overview-conversations'));
 }
+
+// Then try loading API data in background — re-render if it arrives
+DataLoader.init().then(function () {
+  renderOverview();
+});
 </script>
 </body>
 </html>

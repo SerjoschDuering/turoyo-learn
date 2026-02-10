@@ -54,12 +54,15 @@ self.addEventListener('activate', function (e) {
 self.addEventListener('fetch', function (e) {
   var url = new URL(e.request.url);
 
-  // Network-first for API calls
+  // Only intercept GET requests for API (POST cannot be cached)
   if (url.hostname === 'run8n.xyz') {
+    if (e.request.method !== 'GET') return; // let POST/PUT pass through
     e.respondWith(
       fetch(e.request).then(function (res) {
         var clone = res.clone();
-        caches.open(CACHE_NAME).then(function (cache) { cache.put(e.request, clone); });
+        caches.open(CACHE_NAME).then(function (cache) {
+          cache.put(e.request, clone);
+        });
         return res;
       }).catch(function () {
         return caches.match(e.request);
@@ -68,10 +71,15 @@ self.addEventListener('fetch', function (e) {
     return;
   }
 
-  // Cache-first for static assets
-  e.respondWith(
-    caches.match(e.request).then(function (cached) {
-      return cached || fetch(e.request);
-    })
-  );
+  // Cache-first for static assets (same origin)
+  if (url.origin === self.location.origin) {
+    e.respondWith(
+      caches.match(e.request).then(function (cached) {
+        return cached || fetch(e.request);
+      })
+    );
+    return;
+  }
+
+  // Let external requests (fonts, etc.) pass through normally
 });

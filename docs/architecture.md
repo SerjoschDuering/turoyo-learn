@@ -177,21 +177,27 @@ Browser                          n8n                         NocoDB
 ```
 turoyo-learn/
   index.html              Main PWA entry point
+  manifest.json           PWA manifest
+  sw.js                   Service Worker (offline cache)
   demo.html               Demo/showcase page
+  icons/
+    icon-192.png          PWA icon 192x192
+    icon-512.png          PWA icon 512x512
   css/                    Stylesheets
   js/
     api.js                Frontend API wrapper (calls n8n webhooks)
     data.js               Built-in word data (offline fallback)
     data-alphabet.js      Built-in alphabet data
     data-phrases.js       Built-in phrase data
+    data-loader.js        API → global data bridge (tries API, falls back to built-in)
     conv-data.js          Built-in conversation data
     demo-data.js          Demo scenario data
-    version-a.js          Lesson mode (vocabulary drills)
-    version-b.js          SRS review mode
+    version-a.js          Lesson mode (vocabulary drills, syncs progress to API)
+    version-b.js          SRS review mode (syncs SRS state to API)
     conversations.js      Conversation practice UI
     grammar.js            Grammar reference UI
     script-tab.js         Serto script tab
-    recorder.js           Audio recording logic
+    recorder.js           Audio recording logic (uploads to API)
     recorder-ui.js        Audio recording UI
     exercise-types.js     Exercise type definitions
     vfx.js                Visual effects (confetti, etc.)
@@ -203,9 +209,9 @@ turoyo-learn/
     README.md                   Workflow reference notes
   docs/
     architecture.md       This file
-    n8n-api.md            Full API endpoint documentation
-  plan/
-    backend-migration.md  Migration plan and checklist
+    api-reference.md      Full API endpoint documentation
+    app-design.md         Design philosophy and feature rationale
+    language-reference.md Turoyo grammar and vocabulary patterns
 ```
 
 ---
@@ -241,16 +247,19 @@ for the backend unless workflows change. See section 9 for restore procedures.
 
 ### Remaining
 
-- [ ] Wire `version-a.js` to read words from API instead of local `data.js`
-- [ ] Wire `version-b.js` to read/write progress via User API
-- [ ] Wire `conversations.js` to read from API
-- [ ] Wire `recorder.js` to upload via Audio API
-- [ ] Add user creation / login flow in the UI
-- [ ] Implement offline fallback (API -> localStorage cache -> retry on reconnect)
-- [ ] Build n8n workflow for PDF -> AI -> vocabulary extraction
+- [x] Wire `version-a.js` to read words from API instead of local `data.js` — via `DataLoader` module
+- [x] Wire `version-b.js` to read/write progress via User API — syncs SRS state on rateCard, restores on init
+- [x] Wire `conversations.js` to read from API — via `DataLoader` module (maps API conversations to CONV_SCRIPTS)
+- [x] Wire `recorder.js` to upload via Audio API — background upload in onRecordingDone
+- [x] Add user creation / login flow in the UI — name input on welcome card, user badge, settings panel
+- [x] Implement offline fallback (API -> localStorage cache -> retry on reconnect) — Service Worker (sw.js)
+- [ ] Build n8n workflow for PDF -> AI -> vocabulary extraction *(requires n8n admin)*
+- [ ] Expand grammar root analysis beyond 30 words *(content task)*
+- [ ] Add more conversation scripts *(content task)*
 
-**Summary:** Backend is live. Frontend still reads from local JS data files.
-Next phase is wiring each frontend module to the API.
+**Summary:** Backend is wired. `DataLoader` bridges API data → global JS vars.
+Service Worker enables offline PWA. User auth flow creates accounts via n8n.
+Remaining items are content/admin tasks, not frontend code.
 
 ---
 

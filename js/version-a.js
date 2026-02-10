@@ -7,7 +7,7 @@ const VersionA = (() => {
   const EXERCISES_PER_LESSON = 6;
   const XP_PER_CORRECT = 10;
 
-  let page, state;
+  let page, state, _synced = false;
 
   function resetState() {
     state = { exercises: [], idx: 0, score: 0, combo: 0, answered: false, category: null };
@@ -101,8 +101,9 @@ const VersionA = (() => {
     resetState();
     renderHome();
 
-    // Try restoring progress from server (prefer higher values)
-    if (typeof API !== 'undefined' && API.getToken()) {
+    // Try restoring progress from server once per session
+    if (!_synced && typeof API !== 'undefined' && API.getToken()) {
+      _synced = true;
       API.getUser().then(function (user) {
         if (!user || !user.progress) return;
         var rp = user.progress;

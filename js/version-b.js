@@ -4,6 +4,7 @@
 const VersionB = {
   page: null,
   cards: {},
+  _synced: false,
   session: { queue: [], index: 0, results: [] },
   STORAGE_KEY: 'turoyo_b_cards',
   STATS_KEY: 'turoyo_b_stats',
@@ -55,8 +56,9 @@ const VersionB = {
     WORDS.forEach(w => this.ensureCard(w.id));
     this.renderDashboard();
 
-    // Try restoring SRS state from server (merge, prefer newer)
-    if (typeof API !== 'undefined' && API.getToken()) {
+    // Try restoring SRS state from server once per session
+    if (!this._synced && typeof API !== 'undefined' && API.getToken()) {
+      this._synced = true;
       var self = this;
       API.getUser().then(function (user) {
         if (!user || !user.progress || !user.progress.srs) return;
@@ -65,7 +67,8 @@ const VersionB = {
         Object.keys(remote).forEach(function (wid) {
           var rc = remote[wid];
           var lc = self.cards[wid];
-          if (!lc || (rc.due > lc.due)) {
+          // Prefer whichever has more reps (more study = more recent)
+          if (!lc || (rc.reps || 0) > (lc.reps || 0)) {
             self.cards[wid] = rc;
             changed = true;
           }
