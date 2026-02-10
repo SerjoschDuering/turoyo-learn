@@ -118,6 +118,7 @@ var Recorder = (function () {
     reader.onloadend = function () {
       var base64 = reader.result;
       var duration = Math.round((Date.now() - recStartTime) / 1000);
+      var uploadTarget = recTarget;
       if (recTarget && recTarget.type === 'word') {
         saveWordRecording(recTarget.wordId, base64);
       } else if (recTarget && recTarget.type === 'story') {
@@ -135,6 +136,22 @@ var Recorder = (function () {
       }
       recTarget = null;
       render();
+
+      // Background upload to API
+      if (typeof API !== 'undefined' && API.getToken() && uploadTarget) {
+        API.uploadRecording({
+          wordId: uploadTarget.type === 'word' ? uploadTarget.wordId : null,
+          type: uploadTarget.type || 'word',
+          title: uploadTarget.title || '',
+          speaker: getSpeaker(),
+          audioData: base64,
+          duration: duration
+        }).then(function () {
+          console.log('[Recorder] Upload synced');
+        }).catch(function () {
+          console.log('[Recorder] Upload failed, kept in localStorage');
+        });
+      }
     };
     reader.readAsDataURL(blob);
   }

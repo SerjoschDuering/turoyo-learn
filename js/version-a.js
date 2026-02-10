@@ -100,6 +100,26 @@ const VersionA = (() => {
     if (!page) return;
     resetState();
     renderHome();
+
+    // Try restoring progress from server (prefer higher values)
+    if (typeof API !== 'undefined' && API.getToken()) {
+      API.getUser().then(function (user) {
+        if (!user || !user.progress) return;
+        var rp = user.progress;
+        var lp = getProgress();
+        var changed = false;
+        if (rp.xp > lp.xp) { saveProgress({ xp: rp.xp }); changed = true; }
+        if (rp.streak > lp.streak) { saveProgress({ streak: rp.streak }); changed = true; }
+        if (rp.lessons) {
+          var merged = Object.assign({}, lp.lessons);
+          Object.keys(rp.lessons).forEach(function (k) {
+            if ((rp.lessons[k] || 0) > (merged[k] || 0)) { merged[k] = rp.lessons[k]; changed = true; }
+          });
+          if (changed) saveProgress({ lessons: merged });
+        }
+        if (changed) renderHome();
+      }).catch(function () {});
+    }
   }
 
   function isDailyDone() {
@@ -167,6 +187,7 @@ const VersionA = (() => {
       const p = getProgress();
       saveProgress({ xp: p.xp + (result.xp || 0) });
       updateStreak();
+      syncProgressToAPI();
       resetState();
       renderHome();
     });
@@ -274,6 +295,13 @@ const VersionA = (() => {
     else showExercise();
   }
 
+  function syncProgressToAPI() {
+    if (typeof API !== 'undefined' && API.getToken()) {
+      var p = getProgress();
+      API.updateProgress({ xp: p.xp, streak: p.streak, last_date: p.lastDate, lessons: p.lessons });
+    }
+  }
+
   function finishLesson() {
     const earned = state.score * XP_PER_CORRECT, total = state.exercises.length;
     const pct = Math.round((state.score / total) * 100);
@@ -281,6 +309,7 @@ const VersionA = (() => {
     lessons[state.category] = (lessons[state.category] || 0) + 1;
     saveProgress({ xp: p.xp + earned, lessons });
     updateStreak();
+    syncProgressToAPI();
     const cat = CATEGORIES[state.category] || {};
     const stars = pct === 100 ? 3 : pct >= 60 ? 2 : 1;
     const starsHtml = [0,1,2].map(i => `<span class="va-star-item">${i < stars ? '\u2B50' : '\u2606'}</span>`).join('');

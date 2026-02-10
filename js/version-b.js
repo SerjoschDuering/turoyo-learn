@@ -54,6 +54,25 @@ const VersionB = {
     this.loadCards();
     WORDS.forEach(w => this.ensureCard(w.id));
     this.renderDashboard();
+
+    // Try restoring SRS state from server (merge, prefer newer)
+    if (typeof API !== 'undefined' && API.getToken()) {
+      var self = this;
+      API.getUser().then(function (user) {
+        if (!user || !user.progress || !user.progress.srs) return;
+        var remote = user.progress.srs;
+        var changed = false;
+        Object.keys(remote).forEach(function (wid) {
+          var rc = remote[wid];
+          var lc = self.cards[wid];
+          if (!lc || (rc.due > lc.due)) {
+            self.cards[wid] = rc;
+            changed = true;
+          }
+        });
+        if (changed) { self.saveCards(); self.renderDashboard(); }
+      }).catch(function () {});
+    }
   },
 
   /* ---- Dashboard ---- */
@@ -186,6 +205,11 @@ const VersionB = {
     stats.reviews++;
     if (rating >= 3) stats.correct++;
     this.saveStats(stats);
+
+    // Sync to server (debounced)
+    if (typeof API !== 'undefined' && API.getToken()) {
+      API.updateProgress({ srs: this.cards, srs_stats: stats });
+    }
 
     this.session.results.push({ wordId: card.wordId, rating });
     this.session.index++;
